@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>북스테이에서 찾은 내 독서취향은?</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                            950: '#070312',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #070312;
+            color: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4c1d95;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #6d28d9;
+        }
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-brand-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-brand-500 selection:text-white">
+
+    <!-- 상단 헤더 -->
+    <header class="border-b border-purple-950/40 bg-brand-950/80 backdrop-blur-md sticky top-0 z-50 px-4 py-3.5">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <button onclick="resetToHome()" class="flex items-center gap-2 focus:outline-none">
+                <span class="text-2xl">🏡</span>
+                <span class="font-black text-sm tracking-wider bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">BOOKSTAY CURATOR</span>
+            </button>
+            <div>
+                <span id="headerBadge" class="text-[9px] uppercase tracking-widest bg-brand-900/60 text-brand-300 border border-brand-800/50 px-2.5 py-1 rounded-full font-black">ChatGPT 7-STEP</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 모달 다이얼로그 -->
+    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 hidden transition-opacity">
+        <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-xs w-full text-center space-y-4 shadow-2xl">
+            <div class="text-4xl" id="modalEmoji">⚠️</div>
+            <h3 class="font-extrabold text-base text-slate-100" id="modalTitle">알림</h3>
+            <p class="text-xs text-slate-400 leading-relaxed" id="modalMessage">내용</p>
+            <button onclick="closeModal()" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-bold transition-all text-white">확인</button>
+        </div>
+    </div>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="flex-grow flex items-center justify-center p-4 w-full max-w-md mx-auto">
+        
+        <!-- 화면 1: 홈 / 대기실 -->
+        <div id="screen-home" class="w-full space-y-6">
+            <div class="text-center space-y-3 py-6">
+                <div class="inline-flex p-4 bg-gradient-to-tr from-brand-600 to-fuchsia-600 rounded-3xl shadow-xl shadow-brand-500/20 mb-1">
+                    <span class="text-4xl">📚</span>
+                </div>
+                <h1 class="text-2xl font-black tracking-tight leading-tight">북스테이에서 찾은<br>내 독서취향은?</h1>
+                <p class="text-slate-400 text-xs leading-relaxed px-1">
+                    카테고리별 <strong>15인의 대표 작가와 15선의 인생작</strong> 중 내 마음을 흔든 목록을 다중 선택하면, ChatGPT가 당신만을 위한 <strong>슈퍼 독서 프롬프트</strong>를 자동 완성합니다.
+                </p>
+            </div>
+
+            <!-- 특징 요약 카드 -->
+            <div class="bg-slate-900/80 border border-brand-800/40 p-4 rounded-2xl text-xs space-y-2">
+                <div class="flex items-center gap-2 font-extrabold text-brand-300">
+                    <span>✨</span> <span>3가지 세분화 선택지 & 15인 작가 매핑</span>
+                </div>
+                <p class="text-[11px] text-slate-400 leading-relaxed">
+                    A/B/C 3지 선다 질문과 세부 작가/대표작 다중 선택을 결합하여, 당신의 완벽한 독서 페르소나와 AI 프롬프트를 추출해 드립니다.
+                </p>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="startTasteQuiz()" class="w-full p-4 rounded-2xl bg-gradient-to-r from-brand-600 via-purple-600 to-fuchsia-600 hover:from-brand-500 hover:to-fuchsia-500 font-extrabold text-sm text-white shadow-lg shadow-brand-500/10 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    🚀 취향 진단 & 프롬프트 생성 시작하기
+                </button>
+            </div>
+        </div>
+
+        <!-- 화면 2: 퀴즈 화면 -->
+        <div id="screen-quiz" class="w-full space-y-5 hidden flex flex-col justify-center min-h-[65vh]">
+            <div class="space-y-2">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-xs font-bold text-brand-400" id="quizStepLabel">질문 1 / 7</span>
+                    <span id="quizIndexBadge" class="text-[10px] font-black text-fuchsia-400 bg-fuchsia-950 border border-fuchsia-900 px-2.5 py-0.5 rounded-full">Step 1</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                    <div id="quizProgress" class="h-full bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 transition-all duration-300" style="width: 14%;"></div>
+                </div>
+            </div>
+
+            <!-- 현재 질문 Card -->
+            <div class="bg-gradient-to-tr from-slate-900 to-brand-950 border border-purple-900/30 p-4 rounded-2xl space-y-1 text-center shadow-lg">
+                <span class="text-[10px] font-black text-brand-400 tracking-wider uppercase" id="quizCategoryLabel">분야</span>
+                <h3 class="text-sm font-black text-slate-100 leading-snug px-1" id="quizQuestionText">질문 로딩 중...</h3>
+                <p class="text-[10px] text-fuchsia-300 hidden" id="quizSubText">다중 선택이 가능합니다.</p>
+            </div>
+
+            <!-- 선택지 컨테이너 -->
+            <div class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1 custom-scrollbar" id="quizOptionsContainer">
+                <!-- 선택지 동적 생성 -->
+            </div>
+
+            <!-- 다중 선택 단계용 완료 버튼 -->
+            <button id="quizMultiConfirmBtn" onclick="confirmMultiSelectStep()" class="w-full py-3 rounded-2xl bg-gradient-to-r from-brand-600 to-fuchsia-600 hover:from-brand-500 hover:to-fuchsia-500 font-extrabold text-xs text-white shadow-lg transition-all hidden active:scale-[0.98]">
+                선택 완료 후 다음 질문으로 (총 <span id="multiCountNum">0</span>개 선택됨)
+            </button>
+
+            <div class="flex justify-between items-center text-[10px] text-slate-500 px-1 pt-1">
+                <span>선택 분야에 따라 뒤이어 나오는 질문이 구성됩니다.</span>
+                <button onclick="undoQuizAnswer()" id="quizUndoBtn" class="text-brand-400 hover:text-brand-300 font-bold disabled:opacity-30 disabled:cursor-not-allowed">↩️ 이전 단계</button>
+            </div>
+        </div>
+
+        <!-- 화면 3: 로딩 스피너 -->
+        <div id="screen-loading" class="w-full text-center space-y-6 hidden py-12">
+            <div class="relative inline-flex items-center justify-center">
+                <div class="w-20 h-20 rounded-full border-4 border-slate-900 border-t-brand-500 animate-spin"></div>
+                <span class="absolute text-2xl">✨</span>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-lg font-black text-slate-100">북스테이 취향 데이터 매핑 중</h3>
+                <div class="h-5 overflow-hidden text-xs text-brand-400 font-bold" id="loadingStepText">
+                    선택된 작가 대표작 및 작품 출간 연도 매핑 중...
+                </div>
+            </div>
+        </div>
+
+        <!-- 화면 4: 프롬프트 결과 화면 -->
+        <div id="screen-result" class="w-full space-y-5 hidden">
+            
+            <!-- 취향 프로필 카드 -->
+            <div class="bg-gradient-to-b from-brand-900/30 to-brand-950 border border-brand-800/40 p-5 rounded-3xl text-center space-y-3 relative overflow-hidden shadow-xl">
+                <div class="inline-flex p-3 bg-slate-900 rounded-2xl border border-brand-500/30">
+                    <span class="text-4xl" id="profileEmoji">📖</span>
+                </div>
+
+                <!-- OO형 및 감성적 맞춤 멘트 -->
+                <div class="space-y-2 pt-1">
+                    <span class="inline-block px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/40 font-extrabold text-xs" id="profilePersonaType">
+                        ✨ 지적 탐구자형
+                    </span>
+                    <div class="text-xs text-slate-200 leading-relaxed px-1" id="profileCommentary">
+                        <!-- 동적 감성 문구 삽입 -->
+                    </div>
+                </div>
+
+                <p class="text-[10px] font-extrabold text-slate-400" id="profileCategoryName">BOOKSTAY PROFILE</p>
+
+                <!-- 동적 태그 클라우드 -->
+                <div class="flex flex-wrap gap-1.5 justify-center pt-1" id="resultTags">
+                    <!-- 태그 삽입 -->
+                </div>
+            </div>
+
+            <!-- 생성된 프롬프트 영역 -->
+            <div class="space-y-2 bg-slate-900/80 border border-purple-900/30 p-4 rounded-2xl">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-200">💬 ChatGPT 맞춤 추천 프롬프트 (교보문고 검증 적용)</h3>
+                    <span class="text-[9px] font-black text-fuchsia-400 bg-fuchsia-950 border border-fuchsia-900 px-2 py-0.5 rounded">교보문고 검증</span>
+                </div>
+                <p class="text-[10px] text-slate-400">아래 완성된 프롬프트를 복사하여 ChatGPT에 질문하시면, 교보문고에 실존하는 도서만 엄선하여 추천해 드립니다.</p>
+                
+                <div class="relative">
+                    <textarea id="promptOutputArea" readonly class="w-full h-60 p-3 bg-slate-950 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono leading-relaxed resize-none focus:outline-none focus:border-brand-500 transition-colors custom-scrollbar"></textarea>
+                </div>
+
+                <!-- 액션 버튼 -->
+                <div class="grid grid-cols-1 gap-2 pt-1">
+                    <button onclick="copyAndOpenChatGPT()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-600 via-purple-600 to-fuchsia-600 hover:from-brand-500 hover:to-fuchsia-500 font-extrabold text-xs text-white shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
+                        <span>🚀</span>
+                        <span>프롬프트 복사 & ChatGPT 질문하러 가기</span>
+                    </button>
+                    
+                    <button onclick="copyPromptOnly()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5">
+                        <span>📋</span>
+                        <span>프롬프트 텍스트만 복사하기</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 앱 내 실시간 서점 직접 검증 섹션 -->
+            <div class="bg-slate-900/90 border border-brand-800/50 p-4 rounded-2xl space-y-2.5">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">🔍</span>
+                    <h3 class="text-xs font-extrabold text-brand-300">서점에서 내 취향도서 직접 검증하기</h3>
+                </div>
+                <p class="text-[10px] text-slate-400 leading-relaxed">
+                    선택하신 작가와 취향 키워드로 서점 실시간 검색 페이지를 직접 열어 실존 도서를 확인하실 수 있습니다.
+                </p>
+                <div class="grid grid-cols-2 gap-2 pt-0.5">
+                    <button onclick="searchKyoboDirectly()" class="py-2.5 px-3 rounded-xl bg-purple-950/80 border border-purple-800/60 hover:bg-purple-900 text-purple-200 font-bold text-[11px] transition-all flex items-center justify-center gap-1.5">
+                        <span>🛒</span> 교보문고 직접검색
+                    </button>
+                    <button onclick="searchYes24Directly()" class="py-2.5 px-3 rounded-xl bg-fuchsia-950/80 border border-fuchsia-800/60 hover:bg-fuchsia-900 text-fuchsia-200 font-bold text-[11px] transition-all flex items-center justify-center gap-1.5">
+                        <span>📚</span> YES24 직접검색
+                    </button>
+                </div>
+            </div>
+
+            <!-- 하단 토스트 및 재시작 단추 -->
+            <div class="space-y-3 pt-1">
+                <div id="toast" class="hidden text-center text-[10px] text-brand-300 font-extrabold bg-brand-950 border border-brand-900 py-2.5 rounded-xl transition-all shadow-md">
+                    📋 프롬프트가 복사되었습니다! ChatGPT 창이 열리면 바로 붙여넣기(Ctrl+V) 하세요.
+                </div>
+
+                <button onclick="resetToHome()" class="w-full py-3 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-850 font-bold text-xs text-slate-400 transition-all flex items-center justify-center gap-1.5">
+                    <span>🔄</span> 다른 조합으로 취향 재진단하기
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="border-t border-purple-950/30 bg-brand-950 py-4 text-center">
+        <p class="text-slate-600 text-[9px] font-black tracking-widest uppercase">© 2026 BOOKSTAY CURATOR. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <script>
+        // MECE 1단계 메인 분야
+        const MAIN_CATEGORIES = [
+            { id: 'fiction', icon: '📖', title: '문학 / 소설', desc: '서사, 인간 심리, SF, 판타지, 관계, 서정적 고독', tag: '#문학소설' },
+            { id: 'business', icon: '📈', title: '경제 / 경영 / 비즈니스', desc: '거시경제, 리더십, 기업 전략, AI 미래 전망, 마케팅', tag: '#경제경영' },
+            { id: 'selfhelp', icon: '🎯', title: '자기계발 / 커리어 / 멘탈', desc: '생산성, 회복탄력성, 습관 형성, 동기부여, 인간관계', tag: '#자기계발' },
+            { id: 'humanities', icon: '🏛️', title: '인문 / 철학 / 역사 / 사회', desc: '인간 본성, 철학적 사유, 역사적 통찰, 현대 사회 분석', tag: '#인문철학' }
+        ];
+
+        // 분야별 3지 선다 연계 질문 트리
+        const BRANCH_TREES = {
+            fiction: [
+                {
+                    category: '세부 장르',
+                    question: '끌리는 상상력과 서사의 주요 세계관은?',
+                    options: [
+                        { label: 'SF / 미래 디스토피아 / 우주 공상과학', genre: 'SF 및 디스토피아 공상과학', tag: '#SF공상' },
+                        { label: '현대 소설 / 내면 심리 / 관계와 섬세한 고독', genre: '현대소설 및 심리/관계', tag: '#현대심리' },
+                        { label: '미스터리 / 스릴러 / 촘촘한 트릭과 추리', genre: '미스터리 추리 스릴러', tag: '#미스터리스릴러' }
+                    ]
+                },
+                {
+                    category: '템포 & 무드',
+                    question: '이야기가 흘러가는 전개 속도와 문체의 감성은?',
+                    options: [
+                        { label: '한순간도 눈뗄 수 없이 빠른 반전과 사건 중심', pacing: '빠른 반전과 밀도 높은 사건 중심', tag: '#빠른반전' },
+                        { label: '서서히 레이어가 쌓이는 차분하고 감성적인 서정적 호흡', pacing: '차분하고 감성적인 서정적 호흡', tag: '#슬로우번' },
+                        { label: '위트 있고 감각적이며 경쾌한 도심의 스타일', pacing: '위트 있고 감각적인 경쾌한 호흡', tag: '#감각적문체' }
+                    ]
+                },
+                {
+                    category: '결말 여운',
+                    question: '책을 덮었을 때 원하는 피날레의 스타일은?',
+                    options: [
+                        { label: '모든 의혹이 완벽히 해결되는 카타르시스의 닫힌 결말', ending: '명쾌한 닫힌 결말', tag: '#닫힌결말' },
+                        { label: '해석의 여지를 남겨 긴 사색으로 이끄는 열린 결말', ending: '해석의 여지가 남는 열린 결말', tag: '#열린결말' },
+                        { label: '슴슴하지만 은은한 위로와 온기가 남는 힐링형 결말', ending: '은은한 위로가 남는 힐링 결말', tag: '#힐링결말' }
+                    ]
+                }
+            ],
+            business: [
+                {
+                    category: '관심 레이어',
+                    question: '어떤 차원의 지식과 통찰을 얻고 싶으신가요?',
+                    options: [
+                        { label: '거시 경제 흐름 / AI 및 미래 산업 트렌드', focus: '거시경제 및 기술 트렌드', tag: '#미래트렌드' },
+                        { label: '기업 조직 관리 / 리더십 및 실전 마케팅 전략', focus: '기업 전략 및 리더십 실행', tag: '#조직리더십' },
+                        { label: '개인 자산 구축 / 금융 투자의 인사이트', focus: '개인 자산 및 투자 메커니즘', tag: '#자산투자' }
+                    ]
+                },
+                {
+                    category: '접근 서술 방식',
+                    question: '선호하는 지식 전달 가이드 스타일은?',
+                    options: [
+                        { label: '현장에 당장 적용 가능한 실전 체크리스트 중심', style: '실전 적용 중심의 가벼운 인사이트', tag: '#실전적용' },
+                        { label: '깊이 있는 데이터와 구조적 분석 중심의 대작', style: '체계적인 분석 중심의 아카데믹 대작', tag: '#구조적분석' },
+                        { label: '성공한 기업가와 인물의 드라마틱한 스토리텔링', style: '성공 인물의 스토리텔링', tag: '#인물스토리' }
+                    ]
+                },
+                {
+                    category: '주요 대상',
+                    question: '책을 읽는 주된 목적의 시선은?',
+                    options: [
+                        { label: '거대한 시장 전체의 판도와 생태계 변화', target: '시장 전체 생태계 판도 분석', tag: '#시장생태계' },
+                        { label: '격변의 시대 속 개인의 생존과 초격차 역량', target: '개인의 미래 생존 및 초격차 역량', tag: '#개인생존' },
+                        { label: '혁신적인 아이디어를 만드는 창의적 프레임', target: '창의적 프레임워크 구축', tag: '#혁신사고' }
+                    ]
+                }
+            ],
+            selfhelp: [
+                {
+                    category: '핵심 목적',
+                    question: '오늘 책을 통해 가장 얻고 싶은 삶의 변화는?',
+                    options: [
+                        { label: '멘탈 관리 / 스트레스 회복탄력성 / 마음 다스리기', goal: '멘탈 관리 및 회복탄력성 강화', tag: '#멘탈회복' },
+                        { label: '업무 생산성 극대화 / 습관 형성 / 성과 창출', goal: '생산성 및 습관 형성을 통한 성과', tag: '#생산성습관' },
+                        { label: '매끄러운 인간관계 / 커뮤니케이션 / 대화의 기술', goal: '인간관계 및 커뮤니케이션 기술', tag: '#인간관계' }
+                    ]
+                },
+                {
+                    category: '조언의 톤앤매너',
+                    question: '나에게 필요한 솔루션 어조의 결은?',
+                    options: [
+                        { label: '따스한 위로와 공감을 건네는 다정한 가이드', tone: '따뜻한 위로와 동기부여', tag: '#공감위로' },
+                        { label: '냉철한 사실 제시와 뼈있는 일침의 프레임', tone: '냉철한 사실 분석과 뼈있는 조언', tag: '#냉철한조언' },
+                        { label: '뇌과학 및 심리학 실험에 기반한 과학적 조언', tone: '뇌과학 및 심리학에 근거한 과학적 분석', tag: '#과학적근거' }
+                    ]
+                },
+                {
+                    category: '실행 수준',
+                    question: '실천하고 싶은 가이드의 깊이는?',
+                    options: [
+                        { label: '당장 오늘부터 바로 실천 가능한 데일리 루틴', level: '오늘 당장 적용할 실천 루틴', tag: '#데일리루틴' },
+                        { label: '삶의 가치관과 커리어를 바꿀 단단한 인생 원칙', level: '관점을 송두리째 바꿀 삶의 원칙', tag: '#인생원칙' },
+                        { label: '타인과의 관계에서 나를 지키는 경계선 세우기', level: '자아를 지키는 내면 단련', tag: '#내면단련' }
+                    ]
+                }
+            ],
+            humanities: [
+                {
+                    category: '주요 탐구 대상',
+                    question: '지적 호기심이 향하는 방향은?',
+                    options: [
+                        { label: '인간의 마음, 실존, 삶의 의미를 묻는 철학', field: '인간 실존과 철학적 탐구', tag: '#인간철학' },
+                        { label: '문명의 역사, 문학적 유산, 사회 구조 분석', field: '역사적 문명과 사회 구조', tag: '#역사사회' },
+                        { label: '뇌과학, 진화생물학, 인류학의 진화 과정', field: '진화생물학 및 인류학', tag: '#인류진화' }
+                    ]
+                },
+                {
+                    category: '난이도 & 호흡',
+                    question: '원하는 책의 서술 깊이는?',
+                    options: [
+                        { label: '대중적이고 흡입력 있는 흥미로운 교양 스토리', depth: '쉽고 흥미로운 스토리텔링', tag: '#대중적스토리' },
+                        { label: '지적 자극을 주는 깊이 있고 밀도 높은 학술적 사유', depth: '밀도 높고 묵직한 학술적 성찰', tag: '#깊은사색' },
+                        { label: '원전 해석과 다각도 비교 분석의 정교한 구성', depth: '다각도 비교 분석 중심', tag: '#정교한비교' }
+                    ]
+                },
+                {
+                    category: '시점 & 가치',
+                    question: '책이 지녀야 할 핵심 가치는?',
+                    options: [
+                        { label: '지금 현대 사회 문제의 원인을 짚어내는 시의성', value: '현대 사회 문제 해결의 시의성', tag: '#현대시의성' },
+                        { label: '시대를 초월해 고전처럼 남을 보편적 지혜', value: '시대를 초월하는 인류의 지혜', tag: '#통찰적지혜' },
+                        { label: '동서양 사상의 유기적 연결과 새로운 시각', value: '동서양 사상의 통합적 시각', tag: '#동서양통합' }
+                    ]
+                }
+            ]
+        };
+
+        // 카테고리별 15인 대표 작가 (대표작 3선 및 연도 명시)
+        const CATEGORY_AUTHORS = {
+            fiction: [
+                { name: '한강', works: '《소년이 온다》(2014), 《채식주의자》(2007), 《작별하지 않는다》(2021)' },
+                { name: '김초엽', works: '《우리가 빛의 속도로 갈 수 없다면》(2019), 《지구 끝의 온실》(2021), 《파친코》(번역작)' },
+                { name: '베르나르 베르베르', works: '《개미》(1991), 《나무》(2002), 《행성》(2023)' },
+                { name: '히가시노 게이고', works: '《나미야 잡화점의 기적》(2012), 《용의자 X의 헌신》(2005), 《백야행》(1999)' },
+                { name: '테드 창', works: '《당신 인생의 이야기》(2002), 《숨》(2019), 《상인과 연금술사의 문》(2007)' },
+                { name: '김애란', works: '《두근두근 내 인생》(2011), 《바깥은 여름》(2017), 《달려라 아비》(2005)' },
+                { name: '구병모', works: '《위저드 베이커리》(2009), 《파과》(2013), 《아가미》(2011)' },
+                { name: '정유정', works: '《7년의 밤》(2011), 《종의 기원》(2016), 《진이, 지니》(2019)' },
+                { name: '박상영', works: '《대도시의 사랑법》(2019), 《1차원이 되고 싶어》(2021), 《믿음에 대하여》(2022)' },
+                { name: '천선란', works: '《천 개의 파랑》(2020), 《나인》(2021), 《노랜드》(2022)' },
+                { name: '조남주', works: '《82년생 김지영》(2016), 《귤의 맛》(2020), 《서영이》(2022)' },
+                { name: '하루키 (무라카미 하루키)', works: '《상실의 시대》(1987), 《1Q84》(2009), 《도시와 그 불확실한 벽》(2023)' },
+                { name: '황석영', works: '《삼포 가는 길》(1973), 《철도원 삼대》(2020), 《바리데기》(2007)' },
+                { name: '알랭 드 보통', works: '《왜 나는 너를 사랑하는가》(1993), 《낭만적 연애와 그 후의 일상》(2016), 《불안》(2004)' },
+                { name: '양귀자', works: '《모순》(1998), 《원미동 사람들》(1987), 《천년의 사랑》(1995)' }
+            ],
+            business: [
+                { name: '애덤 그랜트', works: '《오리지널스》(2016), 《Think Again》(2021), 《히든 포텐셜》(2023)' },
+                { name: '피터 드러커', works: '《경영의 실제》(1954), 《프로페셔널의 조건》(2000), 《자기경영노트》(1967)' },
+                { name: '클레이튼 크리스텐슨', works: '《혁신기업의 파괴적 자승》(1997), 《당신의 삶을 어떻게 평가할 것인가》(2012), 《자본주의자의 딜레마》(2018)' },
+                { name: '짐 콜린스', works: '《좋은 기업을 넘어 위대한 기업으로》(2001), 《위대한 기업은 다 어디로 갔을까》(2009), 《플라이휠을 돌려라》(2019)' },
+                { name: '나심 니콜라스 탈레브', works: '《블랙 스완》(2007), 《안티프래질》(2012), 《스킨 인 더 게임》(2018)' },
+                { name: '레이 달리 오', works: '《원칙 Principles》(2017), 《변화하는 세계 질서》(2021), 《금융 위기 템플릿》(2018)' },
+                { name: '필립 코틀러', works: '《마케팅 4.0》(2016), 《마케팅 5.0》(2021), 《필립 코틀러의 마케팅 모험》(2023)' },
+                { name: '세스 고딘', works: '《보라빛 소가 온다》(2002), 《이것이 마케팅이다》(2018), 《더 딥》(2007)' },
+                { name: '질비아 첸트너 (경제분석가)', works: '《글로벌 경제 예측》(2022), 《자산 트렌드 2025》(2024), 《머니 시프트》(2023)' },
+                { name: '모건 하우절', works: '《돈의 심리학》(2020), 《불변의 법칙》(2023), 《더 리치》(2024)' },
+                { name: '다니엘 카네만', works: '《생각에 관한 생각》(2011), 《노이즈》(2021), 《직관의 허구》(2015)' },
+                { name: '에릭 리스', works: '《린 스타트업》(2011), 《스타트업 웨이》(2017), 《리더의 조직 구축》(2020)' },
+                { name: '톰 피터스', works: '《초우량 기업의 조건》(1982), 《마인드 마스터》(2018), 《리더십 최고치》(2021)' },
+                { name: '김난도', works: '《트렌드 코리아 2024》(2023), 《트렌드 코리아 2025》(2024), 《아프니까 청춘이다》(2010)' },
+                { name: '최재붕', works: '《포노 사피엔스》(2019), 《최재붕의 메타버스 스쿨》(2022), 《AI 사피엔스》(2024)' }
+            ],
+            selfhelp: [
+                { name: '제임스 클리어', works: '《아주 작은 습관의 힘》(2018), 《쓰면서 완성하는 습관 공식》(2021), 《정밀 행동 가이드》(2023)' },
+                { name: '팀 페리스', works: '《타이탄의 도구들》(2016), 《마흔에 읽는 자아》(2020), 《나는 4시간만 일한다》(2007)' },
+                { name: '사이먼 시넥', works: '《스타트 위드 와이 Start with Why》(2009), 《인피니트 게임》(2019), 《리더는 마지막에 먹는다》(2014)' },
+                { name: '에밀리 워프닉', works: '《모든 것이 되는 법》(2017), 《다재다능한 사람들의 커리어》(2020), 《다중 잠재력》(2022)' },
+                { name: '켈리 최', works: '《웰씽킹》(2021), 《파리에서 도시락을 파는 여자》(2017), 《100일 스노우볼》(2023)' },
+                { name: '자청', works: '《역행자》(2022), 《역행자 확장판》(2023), 《무자본 창업 프레임》(2021)' },
+                { name: '브네 브라운', works: '《수치심의 힘》(2012), 《마음가짐의 힘》(2015), 《리더의 용기》(2018)' },
+                { name: '롭 무어', works: '《레버리지》(2016), 《머니 Money》(2018), 《결단》(2020)' },
+                { name: '게리 켈러', works: '《원씽 The ONE Thing》(2013), 《백만장자 부동산 투자자》(2005), 《원씽 실천 워크북》(2019)' },
+                { name: '카네기 (데일 카네기)', works: '《카네기 인간관계론》(1936), 《카네기 자기관리론》(1948), 《카네기 성공론》(1950)' },
+                { name: '할 엘로드', works: '《미라클 모닝》(2012), 《미라클 모닝 밀리어네어》(2018), 《미라클 모닝 다이어리》(2020)' },
+                { name: '찰스 두히그', works: '《습관의 힘》(2012), 《1등의 습관》(2016), 《소통의 기술》(2024)' },
+                { name: '김창옥', works: '《당신은 아무튼 잘되고 있다》(2020), 《소통형 인간》(2017), 《지금까지 산 것처럼 살지 않겠다》(2023)' },
+                { name: '김미경', works: '《김미경의 마흔 수업》(2023), 《김미경의 리부트》(2020), 《언니의 독설》(2012)' },
+                { name: '쇼펜하우어 (해설서 저자진)', works: '《마흔에 읽는 쇼펜하우어》(2023), 《남에게 보여주려고 인생을 살지 마라》(2023), 《쇼펜하우어 아포리즘》(2024)' }
+            ],
+            humanities: [
+                { name: '유발 하라리', works: '《사피엔스》(2011), 《호모 데우스》(2015), 《넥서스 NEXUS》(2024)' },
+                { name: '재러드 다이아몬드', works: '《총, 균, 쇠》(1997), 《문명의崩壞 Collapse》(2005), 《대변동 Upheaval》(2019)' },
+                { name: '마이클 샌델', works: '《정의란 무엇인가》(2008), 《공정하다는 착각》(2020), 《돈으로 살 수 없는 것들》(2012)' },
+                { name: '유시민', works: '《거꾸로 읽는 세계사》(1988), 《국가란 무엇인가》(2011), 《문과남자의 과학공부》(2023)' },
+                { name: '김상욱 (물리학자)', works: '《떨림과 울림》(2018), 《김상욱의 양자공부》(2017), 《하늘과 바람과 별과 인간》(2023)' },
+                { name: '최진석 (철학자)', works: '《생각하는 힘, 노자 인문학》(2015), 《탁월한 사유의 시선》(2017), 《경계에 서기》(2021)' },
+                { name: '신영복', works: '《감옥으로부터의 사색》(1988), 《담론》(2015), 《나무야 나무야》(1996)' },
+                { name: '조던 피터슨', works: '《12가지 인생의 법칙》(2018), 《질서 너머》(2021), 《인생의 지도》(1999)' },
+                { name: '리처드 도킨스', works: '《이기적 유전자》(1976), 《만들어진 신》(2006), 《영혼의 유전자》(2021)' },
+                { name: '한병철', works: '《피로사회》(2010), 《투명사회》(2012), 《서사의 위기》(2023)' },
+                { name: '이진우 (철학자)', works: '《니체의 인생수업》(2022), 《의심의 철학》(2018), 《한 줄의 철학》(2024)' },
+                { name: '채사장', works: '《지적 대화를 위한 넓고 얕은 지식 1》(2014), 《지대넓얕 0》(2019), 《열한 계단》(2016)' },
+                { name: '정재승', works: '《정재승의 과학콘서트》(2001), 《열두 발자국》(2018), 《뇌과학의 미래》(2022)' },
+                { name: '빌 브라이슨', works: '《거의 모든 것의 역사》(2003), 《바디: 인간의 몸 해부》(2019), 《나를 부르는 숲》(1998)' },
+                { name: '카를 세이건', works: '《코스모스》(1980), 《창백한 푸른 점》(1994), 《악령이 출몰하는 세상》(1995)' }
+            ]
+        };
+
+        // 카테고리별 15선 대표작 (저자 및 출간연도 명시)
+        const CATEGORY_WORKS = {
+            fiction: [
+                { title: '《소년이 온다》', info: '저자: 한강 | 출간연도: 2014년' },
+                { title: '《우리가 빛의 속도로 갈 수 없다면》', info: '저자: 김초엽 | 출간연도: 2019년' },
+                { title: '《모순》', info: '저자: 양귀자 | 출간연도: 1998년' },
+                { title: '《나미야 잡화점의 기적》', info: '저자: 히가시노 게이고 | 출간연도: 2012년' },
+                { title: '《지구 끝의 온실》', info: '저자: 김초엽 | 출간연도: 2021년' },
+                { title: '《채식주의자》', info: '저자: 한강 | 출간연도: 2007년' },
+                { title: '《7년의 밤》', info: '저자: 정유정 | 출간연도: 2011년' },
+                { title: '《달러구트 꿈 백화점》', info: '저자: 이미예 | 출간연도: 2020년' },
+                { title: '《불편한 편의점》', info: '저자: 김호연 | 출간연도: 2021년' },
+                { title: '《천 개의 파랑》', info: '저자: 천선란 | 출간연도: 2020년' },
+                { title: '《도시와 그 불확실한 벽》', info: '저자: 무라카미 하루키 | 출간연도: 2023년' },
+                { title: '《구의 증명》', info: '저자: 최진영 | 출간연도: 2015년' },
+                { title: '《바깥은 여름》', info: '저자: 김애란 | 출간연도: 2017년' },
+                { title: '《대도시의 사랑법》', info: '저자: 박상영 | 출간연도: 2019년' },
+                { title: '《작별하지 않는다》', info: '저자: 한강 | 출간연도: 2021년' }
+            ],
+            business: [
+                { title: '《돈의 심리학》', info: '저자: 모건 하우절 | 출간연도: 2020년' },
+                { title: '《불변의 법칙》', info: '저자: 모건 하우절 | 출간연도: 2023년' },
+                { title: '《Think Again (생각의 재구성)》', info: '저자: 애덤 그랜트 | 출간연도: 2021년' },
+                { title: '《히든 포텐셜》', info: '저자: 애덤 그랜트 | 출간연도: 2023년' },
+                { title: '《원칙 Principles》', info: '저자: 레이 달리 오 | 출간연도: 2017년' },
+                { title: '《생각에 관한 생각》', info: '저자: 다니엘 카네만 | 출간연도: 2011년' },
+                { title: '《좋은 기업을 넘어 위대한 기업으로》', info: '저자: 짐 콜린스 | 출간연도: 2001년' },
+                { title: '《블랙 스완》', info: '저자: 나심 니콜라스 탈레브 | 출간연도: 2007년' },
+                { title: '《린 스타트업》', info: '저자: 에릭 리스 | 출간연도: 2011년' },
+                { title: '《트렌드 코리아 2025》', info: '저자: 김난도 외 | 출간연도: 2024년' },
+                { title: '《포노 사피엔스》', info: '저자: 최재붕 | 출간연도: 2019년' },
+                { title: '《보라빛 소가 온다》', info: '저자: 세스 고딘 | 출간연도: 2002년' },
+                { title: '《마케팅 5.0》', info: '저자: 필립 코틀러 | 출간연도: 2021년' },
+                { title: '《안티프래질》', info: '저자: 나심 니콜라스 탈레브 | 출간연도: 2012년' },
+                { title: '《AI 사피엔스》', info: '저자: 최재붕 | 출간연도: 2024년' }
+            ],
+            selfhelp: [
+                { title: '《아주 작은 습관의 힘》', info: '저자: 제임스 클리어 | 출간연도: 2018년' },
+                { title: '《타이탄의 도구들》', info: '저자: 팀 페리스 | 출간연도: 2016년' },
+                { title: '《원씽 The ONE Thing》', info: '저자: 게리 켈러 | 출간연도: 2013년' },
+                { title: '《역행자》', info: '저자: 자청 | 출간연도: 2022년' },
+                { title: '《데일 카네기 인간관계론》', info: '저자: 데일 카네기 | 출간연도: 1936년 (개정 지속)' },
+                { title: '《웰씽킹》', info: '저자: 켈리 최 | 출간연도: 2021년' },
+                { title: '《마흔에 읽는 쇼펜하우어》', info: '저자: 강용수 | 출간연도: 2023년' },
+                { title: '《레버리지》', info: '저자: 롭 무어 | 출간연도: 2016년' },
+                { title: '《미라클 모닝》', info: '저자: 할 엘로드 | 출간연도: 2012년' },
+                { title: '《김미경의 마흔 수업》', info: '저자: 김미경 | 출간연도: 2023년' },
+                { title: '《습관의 힘》', info: '저자: 찰스 두히그 | 출간연도: 2012년' },
+                { title: '《모든 것이 되는 법》', info: '저자: 에밀리 워프닉 | 출간연도: 2017년' },
+                { title: '《당신은 아무튼 잘되고 있다》', info: '저자: 김창옥 | 출간연도: 2020년' },
+                { title: '《리더의 용기》', info: '저자: 브네 브라운 | 출간연도: 2018년' },
+                { title: '《기분이 태도가 되지 않게》', info: '저자: 레몬심리 | 출간연도: 2020년' }
+            ],
+            humanities: [
+                { title: '《사피엔스》', info: '저자: 유발 하라리 | 출간연도: 2011년' },
+                { title: '《총, 균, 쇠》', info: '저자: 재러드 다이아몬드 | 출간연도: 1997년' },
+                { title: '《정의란 무엇인가》', info: '저자: 마이클 샌델 | 출간연도: 2008년' },
+                { title: '《공정하다는 착각》', info: '저자: 마이클 샌델 | 출간연도: 2020년' },
+                { title: '《넥서스 NEXUS》', info: '저자: 유발 하라리 | 출간연도: 2024년' },
+                { title: '《하늘과 바람과 별과 인간》', info: '저자: 김상욱 | 출간연도: 2023년' },
+                { title: '《떨림과 울림》', info: '저자: 김상욱 | 출간연도: 2018년' },
+                { title: '《지적 대화를 위한 넓고 얕은 지식 1》', info: '저자: 채사장 | 출간연도: 2014년' },
+                { title: '《피로사회》', info: '저자: 한병철 | 출간연도: 2010년' },
+                { title: '《문과남자의 과학공부》', info: '저자: 유시민 | 출간연도: 2023년' },
+                { title: '《12가지 인생의 법칙》', info: '저자: 조던 피터슨 | 출간연도: 2018년' },
+                { title: '《코스모스》', info: '저자: 카를 세이건 | 출간연도: 1980년' },
+                { title: '《이기적 유전자》', info: '저자: 리처드 도킨스 | 출간연도: 1976년' },
+                { title: '《열두 발자국》', info: '저자: 정재승 | 출간연도: 2018년' },
+                { title: '《탁월한 사유의 시선》', info: '저자: 최진석 | 출간연도: 2017년' }
+            ]
+        };
+
+        // 공통 질문 (Step 7: 출간 연대)
+        const FINAL_ERA_QUESTION = {
+            category: '출간 연대',
+            question: '선호하는 도서의 발간 시기는?',
+            options: [
+                { label: '지금 서점가에서 가장 핫한 2025~2026 최신 신간 위주', era: '2025년~2026년에 출간된 최신 신간 도서', tag: '#2026신작' },
+                { label: '수년간 독자들에게 검증받은 필독 베스트셀러 위주', era: '최근 수년간 검증받은 베스트셀러 및 필독서', tag: '#검증베스트' },
+                { label: '신간과 스테디셀러를 조화롭게 섞은 균형 잡힌 추천', era: '최신 신간과 검증 베스트셀러의 균형 조합', tag: '#균형조합' }
+            ]
+        };
+
+        // 앱 상태 관리
+        let selectedMainCategory = null;
+        let currentStepIndex = 0; // 0:메인, 1~3:분기, 4:작가선택(복수), 5:작품선택(복수), 6:출간연대
+        let answerHistory = [];
+        let tempSelectedAuthors = [];
+        let tempSelectedWorks = [];
+
+        function showCustomModal(title, msg, emoji = '🔮') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = msg;
+            document.getElementById('modalEmoji').innerText = emoji;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.add('hidden');
+        }
+
+        function hideAllScreens() {
+            ['screen-home', 'screen-quiz', 'screen-loading', 'screen-result'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+        }
+
+        function resetToHome() {
+            hideAllScreens();
+            document.getElementById('screen-home').classList.remove('hidden');
+            document.getElementById('headerBadge').innerText = "ChatGPT 7-STEP";
+
+            selectedMainCategory = null;
+            currentStepIndex = 0;
+            answerHistory = [];
+            tempSelectedAuthors = [];
+            tempSelectedWorks = [];
+        }
+
+        function startTasteQuiz() {
+            hideAllScreens();
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            document.getElementById('headerBadge').innerText = "Step Quiz";
+
+            selectedMainCategory = null;
+            currentStepIndex = 0;
+            answerHistory = [];
+            tempSelectedAuthors = [];
+            tempSelectedWorks = [];
+
+            renderCurrentStep();
+        }
+
+        // 현재 단계 화면 렌더링
+        function renderCurrentStep() {
+            const container = document.getElementById('quizOptionsContainer');
+            container.innerHTML = '';
+
+            const stepBadge = document.getElementById('quizIndexBadge');
+            const stepLabel = document.getElementById('quizStepLabel');
+            const progress = document.getElementById('quizProgress');
+            const undoBtn = document.getElementById('quizUndoBtn');
+            const confirmBtn = document.getElementById('quizMultiConfirmBtn');
+            const subText = document.getElementById('quizSubText');
+
+            stepLabel.innerText = `질문 ${currentStepIndex + 1} / 7`;
+            progress.style.width = `${((currentStepIndex + 1) / 7) * 100}%`;
+            stepBadge.innerText = `Step ${currentStepIndex + 1}`;
+
+            undoBtn.disabled = answerHistory.length === 0;
+            confirmBtn.classList.add('hidden');
+            subText.classList.add('hidden');
+
+            // Step 0: 메인 분야
+            if (currentStepIndex === 0) {
+                document.getElementById('quizCategoryLabel').innerText = "메인 관심 분야";
+                document.getElementById('quizQuestionText').innerText = "오늘 북스테이에서 탐구하고 싶은 핵심 카테고리는?";
+
+                MAIN_CATEGORIES.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-card w-full p-3.5 rounded-2xl border border-slate-800 bg-slate-900/60 hover:border-brand-500/50 hover:bg-slate-900 text-left flex items-start gap-3 group active:scale-[0.98]";
+                    btn.onclick = () => selectMainCategory(cat);
+                    btn.innerHTML = `
+                        <div class="text-2xl pt-0.5">${cat.icon}</div>
+                        <div class="flex-grow space-y-0.5">
+                            <p class="text-xs font-black text-slate-100 group-hover:text-brand-300 transition-colors">${cat.title}</p>
+                            <p class="text-[10px] text-slate-400 font-medium">${cat.desc}</p>
+                        </div>
+                    `;
+                    container.appendChild(btn);
+                });
+            }
+            // Step 1~3: 3지선다 연계 질문
+            else if (currentStepIndex >= 1 && currentStepIndex <= 3) {
+                const branchQuestions = BRANCH_TREES[selectedMainCategory.id];
+                const qObj = branchQuestions[currentStepIndex - 1];
+
+                document.getElementById('quizCategoryLabel').innerText = `${selectedMainCategory.title} > ${qObj.category}`;
+                document.getElementById('quizQuestionText').innerText = qObj.question;
+
+                const labels = ['A', 'B', 'C'];
+                qObj.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-card w-full p-3.5 rounded-2xl border border-slate-800 bg-slate-900/60 hover:border-brand-500/50 hover:bg-slate-900 text-left flex items-start gap-3 group active:scale-[0.98]";
+                    btn.onclick = () => selectSingleOption(opt);
+                    btn.innerHTML = `
+                        <div class="w-6 h-6 flex items-center justify-center rounded-full bg-brand-950 font-black text-xs text-brand-400 group-hover:bg-brand-500 group-hover:text-white transition-colors">${labels[idx]}</div>
+                        <div class="flex-grow pt-0.5">
+                            <p class="text-xs font-extrabold text-slate-200">${opt.label}</p>
+                        </div>
+                    `;
+                    container.appendChild(btn);
+                });
+            }
+            // Step 4: 15인 대표 작가 선택 (다중 선택)
+            else if (currentStepIndex === 4) {
+                document.getElementById('quizCategoryLabel').innerText = `${selectedMainCategory.title} > 대표 작가`;
+                document.getElementById('quizQuestionText').innerText = "영감을 주는 좋아하는 작가를 선택해 주세요.";
+                subText.innerText = "복수 선택이 가능합니다. (선택 안 하고 넘어가기도 가능)";
+                subText.classList.remove('hidden');
+
+                confirmBtn.classList.remove('hidden');
+                updateMultiCountDisplay();
+
+                const authorList = CATEGORY_AUTHORS[selectedMainCategory.id];
+                authorList.forEach(author => {
+                    const isSelected = tempSelectedAuthors.some(a => a.name === author.name);
+                    const btn = document.createElement('button');
+                    btn.className = `option-card w-full p-3 rounded-2xl border text-left flex items-center justify-between gap-2 transition-all active:scale-[0.98] ${isSelected ? 'border-fuchsia-500 bg-fuchsia-950/40 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700'}`;
+                    btn.onclick = () => toggleAuthorSelection(author);
+                    btn.innerHTML = `
+                        <div class="space-y-0.5">
+                            <p class="text-xs font-black ${isSelected ? 'text-fuchsia-300' : 'text-slate-200'}">${author.name}</p>
+                            <p class="text-[10px] ${isSelected ? 'text-fuchsia-200/80' : 'text-slate-400'}">대표작: ${author.works}</p>
+                        </div>
+                        <div class="w-5 h-5 rounded-lg border flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-fuchsia-500 border-fuchsia-400 text-white' : 'border-slate-700 bg-slate-950 text-transparent'}">✓</div>
+                    `;
+                    container.appendChild(btn);
+                });
+            }
+            // Step 5: 15선 대표작 선택 (다중 선택)
+            else if (currentStepIndex === 5) {
+                document.getElementById('quizCategoryLabel').innerText = `${selectedMainCategory.title} > 대표작`;
+                document.getElementById('quizQuestionText').innerText = "인상 깊게 읽었거나 끌리는 명작을 선택해 주세요.";
+                subText.innerText = "복수 선택이 가능합니다. (선택 안 하고 넘어가기도 가능)";
+                subText.classList.remove('hidden');
+
+                confirmBtn.classList.remove('hidden');
+                updateMultiCountDisplay();
+
+                const workList = CATEGORY_WORKS[selectedMainCategory.id];
+                workList.forEach(work => {
+                    const isSelected = tempSelectedWorks.some(w => w.title === work.title);
+                    const btn = document.createElement('button');
+                    btn.className = `option-card w-full p-3 rounded-2xl border text-left flex items-center justify-between gap-2 transition-all active:scale-[0.98] ${isSelected ? 'border-brand-500 bg-brand-950/40 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700'}`;
+                    btn.onclick = () => toggleWorkSelection(work);
+                    btn.innerHTML = `
+                        <div class="space-y-0.5">
+                            <p class="text-xs font-black ${isSelected ? 'text-brand-300' : 'text-slate-200'}">${work.title}</p>
+                            <p class="text-[10px] ${isSelected ? 'text-brand-200/80' : 'text-slate-400'}">${work.info}</p>
+                        </div>
+                        <div class="w-5 h-5 rounded-lg border flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-brand-500 border-brand-400 text-white' : 'border-slate-700 bg-slate-950 text-transparent'}">✓</div>
+                    `;
+                    container.appendChild(btn);
+                });
+            }
+            // Step 6: 출간 연대 선택
+            else if (currentStepIndex === 6) {
+                const qObj = FINAL_ERA_QUESTION;
+                document.getElementById('quizCategoryLabel').innerText = qObj.category;
+                document.getElementById('quizQuestionText').innerText = qObj.question;
+
+                const labels = ['A', 'B', 'C'];
+                qObj.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-card w-full p-3.5 rounded-2xl border border-slate-800 bg-slate-900/60 hover:border-brand-500/50 hover:bg-slate-900 text-left flex items-start gap-3 group active:scale-[0.98]";
+                    btn.onclick = () => selectSingleOption(opt);
+                    btn.innerHTML = `
+                        <div class="w-6 h-6 flex items-center justify-center rounded-full bg-brand-950 font-black text-xs text-brand-400 group-hover:bg-brand-500 group-hover:text-white transition-colors">${labels[idx]}</div>
+                        <div class="flex-grow pt-0.5">
+                            <p class="text-xs font-extrabold text-slate-200">${opt.label}</p>
+                        </div>
+                    `;
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        function selectMainCategory(catObj) {
+            selectedMainCategory = catObj;
+            answerHistory.push({ step: 0, selection: catObj });
+            currentStepIndex = 1;
+            renderCurrentStep();
+        }
+
+        function selectSingleOption(optObj) {
+            answerHistory.push({ step: currentStepIndex, selection: optObj });
+            currentStepIndex++;
+
+            if (currentStepIndex > 6) {
+                showLoadingScreen();
+            } else {
+                renderCurrentStep();
+            }
+        }
+
+        function toggleAuthorSelection(author) {
+            const idx = tempSelectedAuthors.findIndex(a => a.name === author.name);
+            if (idx >= 0) {
+                tempSelectedAuthors.splice(idx, 1);
+            } else {
+                tempSelectedAuthors.push(author);
+            }
+            updateMultiCountDisplay();
+            renderCurrentStep();
+        }
+
+        function toggleWorkSelection(work) {
+            const idx = tempSelectedWorks.findIndex(w => w.title === work.title);
+            if (idx >= 0) {
+                tempSelectedWorks.splice(idx, 1);
+            } else {
+                tempSelectedWorks.push(work);
+            }
+            updateMultiCountDisplay();
+            renderCurrentStep();
+        }
+
+        function updateMultiCountDisplay() {
+            const numSpan = document.getElementById('multiCountNum');
+            if (currentStepIndex === 4) {
+                numSpan.innerText = tempSelectedAuthors.length;
+            } else if (currentStepIndex === 5) {
+                numSpan.innerText = tempSelectedWorks.length;
+            }
+        }
+
+        function confirmMultiSelectStep() {
+            if (currentStepIndex === 4) {
+                answerHistory.push({ step: 4, selection: tempSelectedAuthors });
+            } else if (currentStepIndex === 5) {
+                answerHistory.push({ step: 5, selection: tempSelectedWorks });
+            }
+            currentStepIndex++;
+            renderCurrentStep();
+        }
+
+        function undoQuizAnswer() {
+            if (answerHistory.length === 0) return;
+            const last = answerHistory.pop();
+            currentStepIndex = last.step;
+            if (currentStepIndex === 0) {
+                selectedMainCategory = null;
+            }
+            renderCurrentStep();
+        }
+
+        function showLoadingScreen() {
+            hideAllScreens();
+            document.getElementById('screen-loading').classList.remove('hidden');
+            document.getElementById('headerBadge').innerText = "Building";
+
+            const steps = [
+                "선택한 메인 분야 트리 및 파라미터 결합 중...",
+                "좋아하는 작가 및 인생작 스타일 감수성 분석 중...",
+                "ChatGPT 슈퍼 프롬프트 최종 조합 완료!"
+            ];
+
+            let idx = 0;
+            const logEl = document.getElementById('loadingStepText');
+            
+            const timer = setInterval(() => {
+                idx++;
+                if (idx < steps.length) {
+                    logEl.innerText = steps[idx];
+                } else {
+                    clearInterval(timer);
+                    generatePromptOutput();
+                }
+            }, 450);
+        }
+
+        // 맞춤형 페르소나 유형 및 멘트 생성기
+        function getPersonaProfile(catId, tags) {
+            if (catId === 'fiction') {
+                if (tags.includes('#SF공상')) {
+                    return {
+                        type: "✨ 미래 서사 탐험가형",
+                        commentary: "상상력의 경계선에서 미래와 인간의 실존을 깊이 있게 탐구하는 당신!<br><strong class='text-brand-300'>스케일 크고 감각적인 세계관이 돋보이는 책</strong>을 좋아하시는군요! 이런 책 어떠세요?"
+                    };
+                } else if (tags.includes('#미스터리스릴러')) {
+                    return {
+                        type: "✨ 촘촘한 트릭 추리자형",
+                        commentary: "치밀한 복선과 반전 속에서 사건의 진실을 추리하는 고도의 몰입을 즐기는 당신!<br><strong class='text-brand-300'>한순간도 눈을 뗄 수 없는 쫄깃한 기승전결 소설</strong>을 좋아하시는군요! 이런 책 어떠세요?"
+                    };
+                } else {
+                    return {
+                        type: "✨ 섬세한 내면 사색가형",
+                        commentary: "인간 관계의 고독과 내면의 깊은 결을 따뜻하고 단단한 시선으로 보듬는 당신!<br><strong class='text-brand-300'>서서히 마음을 물들이는 감성 소설</strong>을 좋아하시는군요! 이런 책 어떠세요?"
+                    };
+                }
+            } else if (catId === 'business') {
+                if (tags.includes('#미래트렌드')) {
+                    return {
+                        type: "✨ 글로벌 트렌드 인사이트형",
+                        commentary: "거시 경제의 흐름과 AI 시대의 최첨단 변화를 남들보다 빠르게 포착하는 당신!<br><strong class='text-brand-300'>시장의 판도를 파악하는 통찰력 있는 책</strong>을 좋아하시는군요! 이런 책 어떠세요?"
+                    };
+                } else {
+                    return {
+                        type: "✨ 초격차 전략 리더형",
+                        commentary: "조직의 성과와 탁월한 리더십 프레임을 끊임없이 연구하고 적용하는 당신!<br><strong class='text-brand-300'>현장에 즉시 적용 가능한 실전 전략서</strong>를 좋아하시는군요! 이런 책 어떠세요?"
+                    };
+                }
+            } else if (catId === 'selfhelp') {
+                if (tags.includes('#멘탈회복')) {
+                    return {
+                        type: "✨ 마인드 밸런서형",
+                        commentary: "지친 일상 속 나만의 중심을 잡고 회복탄력성을 단단하게 가꾸고자 하는 당신!<br><strong class='text-brand-300'>따뜻한 위로와 내면 자아 성찰을 주는 책</strong>을 좋아하시는군요! 이런 책 어떠세요?"
+                    };
+                } else {
+                    return {
+                        type: "✨ 초생산성 성과 창출가형",
+                        commentary: "작은 습관의 힘과 데일리 루틴을 통해 확실한 목표 성과를 이뤄내는 당신!<br><strong class='text-brand-300'>삶의 시스템을 효율적으로 재구성하는 가이드북</strong>을 좋아하시는군요! 이런 책 어떠세요?"
+                    };
+                }
+            } else {
+                return {
+                    type: "✨ 지적 탐구 철학자형",
+                    commentary: "인간의 본성과 문명의 역사, 삶의 근본적인 의미를 묵직하게 탐구하는 당신!<br><strong class='text-brand-300'>깊이 있는 시각과 지적 자극을 선물하는 인문서</strong>를 좋아하시는군요! 이런 책 어떠세요?"
+                };
+            }
+        }
+
+        // ChatGPT용 맞춤 프롬프트 생성
+        function generatePromptOutput() {
+            hideAllScreens();
+            document.getElementById('screen-result').classList.remove('hidden');
+            document.getElementById('headerBadge').innerText = "Prompt Ready";
+
+            document.getElementById('profileEmoji').innerText = selectedMainCategory.icon;
+            document.getElementById('profileCategoryName').innerText = selectedMainCategory.title;
+
+            let tags = [selectedMainCategory.tag];
+            let detailsText = [];
+            let favoriteAuthorsText = "특별히 지정하지 않음";
+            let favoriteWorksText = "특별히 지정하지 않음";
+
+            answerHistory.forEach((item) => {
+                if (item.step >= 1 && item.step <= 3 || item.step === 6) {
+                    const sel = item.selection;
+                    if (sel.tag) tags.push(sel.tag);
+                    
+                    const key = Object.keys(sel).find(k => !['label', 'tag'].includes(k));
+                    if (key && sel[key]) {
+                        detailsText.push(`- ${sel[key]}`);
+                    }
+                } else if (item.step === 4 && Array.isArray(item.selection) && item.selection.length > 0) {
+                    favoriteAuthorsText = item.selection.map(a => a.name).join(', ');
+                } else if (item.step === 5 && Array.isArray(item.selection) && item.selection.length > 0) {
+                    favoriteWorksText = item.selection.map(w => w.title).join(', ');
+                }
+            });
+
+            // 페르소나 및 동적 멘트 적용
+            const personaInfo = getPersonaProfile(selectedMainCategory.id, tags);
+            document.getElementById('profilePersonaType').innerText = personaInfo.type;
+            document.getElementById('profileCommentary').innerHTML = personaInfo.commentary;
+
+            // 태그 클라우드 노출
+            const tagsContainer = document.getElementById('resultTags');
+            tagsContainer.innerHTML = '';
+            tags.forEach(t => {
+                const badge = document.createElement('span');
+                badge.className = "text-[9px] font-extrabold bg-brand-900/60 text-brand-300 border border-brand-800/40 px-2.5 py-0.5 rounded-full";
+                badge.innerText = t;
+                tagsContainer.appendChild(badge);
+            });
+
+            // 프롬프트 본문 조합 (교보문고 검색 필수 참고 & 환각 방지 지침)
+            let prompt = `[역할 정의]\n`;
+            prompt += `당신은 대한민국 최고의 출판 큐레이터이자 종합 도서 평론가입니다.\n\n`;
+            prompt += `[사용자 북스테이 7단계 정밀 독서 취향 프로필]\n`;
+            prompt += `- 페르소나 유형: ${personaInfo.type}\n`;
+            prompt += `- 메인 검색 분야: ${selectedMainCategory.title}\n`;
+            prompt += `- 세부 독서 취향 특성:\n${detailsText.join('\n')}\n`;
+            prompt += `- 내가 좋아하는 / 영향받은 작가: ${favoriteAuthorsText}\n`;
+            prompt += `- 내가 재미있게 읽은 / 선호하는 대표작: ${favoriteWorksText}\n`;
+            prompt += `- 취향 태그 클라우드: ${tags.join(', ')}\n\n`;
+
+            prompt += `[🚨 교보문고 실존 도서 검증 및 환각 방지 지침]\n`;
+            prompt += `1. **교보문고 도서 검색 필수 참고**: 도서를 추천하기 전, 반드시 교보문고 도서 검색(https://search.kyobobook.co.kr) 및 웹 검색을 참고하여 실제 교보문고에 등록되어 출간·판매 중인 도서만 추천하세요.\n`;
+            prompt += `2. **실존 도서 100% 필수**: 절대로 존재하지 않는 가상의 도서, 가상의 저자, 가상의 출판사를 지어내거나 왜곡하지 마세요.\n`;
+            prompt += `3. **신간 조건 유연화**: 만약 2025~2026년 신간 중 사용자 취향에 부합하는 실존 도서가 부족하다면, 억지로 가짜 책을 만들지 말고 교보문고에서 실제 확인되는 2023~2025년 검증 베스트셀러/명작으로 추천을 구성하세요.\n`;
+            prompt += `4. **교보문고 검색 URL 작성 엄격 규칙**:\n`;
+            prompt += `   - URL 형태: https://search.kyobobook.co.kr/search?keyword=단어1+단어2\n`;
+            prompt += `   - 부제목, 괄호, 특수문자를 모두 지우고, 메인 도서명의 핵심 단어만 '+' 기호로 연결하여 링크를 만드세요.\n`;
+            prompt += `   - 올바른 예: https://search.kyobobook.co.kr/search?keyword=소년이+온다\n\n`;
+
+            prompt += `[출력 요청 서식]\n`;
+            prompt += `추천 도서 5권에 대해 아래 양식을 정확히 지켜 작성해 주세요:\n\n`;
+            prompt += `1. 도서명 (저자 / 출판사 / 정확한 출간연도)\n`;
+            prompt += `- 추천 이유: 사용자가 선택한 취향 특성 및 좋아하는 작가/작품과의 접점을 2~3문장으로 설명\n`;
+            prompt += `- 주요 내용 및 감상 포인트: 핵심 내용과 독서 포인트 요약\n`;
+            prompt += `- 🛒 교보문고 바로가기: https://search.kyobobook.co.kr/search?keyword=핵심+도서+제목\n`;
+
+            document.getElementById('promptOutputArea').value = prompt;
+        }
+
+        // 앱 내 직접 교보문고 검색 실행
+        function searchKyoboDirectly() {
+            let query = selectedMainCategory ? selectedMainCategory.title : "베스트셀러";
+            if (tempSelectedAuthors.length > 0) {
+                query = tempSelectedAuthors[0].name;
+            } else if (tempSelectedWorks.length > 0) {
+                query = tempSelectedWorks[0].title.replace(/《|》/g, '');
+            }
+            const url = `https://search.kyobobook.co.kr/search?keyword=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
+        }
+
+        // 앱 내 직접 YES24 검색 실행
+        function searchYes24Directly() {
+            let query = selectedMainCategory ? selectedMainCategory.title : "베스트셀러";
+            if (tempSelectedAuthors.length > 0) {
+                query = tempSelectedAuthors[0].name;
+            } else if (tempSelectedWorks.length > 0) {
+                query = tempSelectedWorks[0].title.replace(/《|》/g, '');
+            }
+            const url = `https://www.yes24.com/Product/Search?domain=ALL&query=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
+        }
+
+        function copyPromptOnly() {
+            const promptArea = document.getElementById('promptOutputArea');
+            promptArea.select();
+
+            try {
+                const ok = document.execCommand('copy');
+                if (ok) {
+                    showToast();
+                } else {
+                    showCustomModal("복사 알림", "클립보드 복사에 실패했습니다.", "⚠️");
+                }
+            } catch (err) {
+                showCustomModal("오류", "지원되지 않는 환경입니다.", "❌");
+            }
+        }
+
+        function copyAndOpenChatGPT() {
+            copyPromptOnly();
+            setTimeout(() => {
+                window.open('https://chatgpt.com', '_blank');
+            }, 400);
+        }
+
+        function showToast() {
+            const t = document.getElementById('toast');
+            t.classList.remove('hidden');
+            setTimeout(() => {
+                t.classList.add('hidden');
+            }, 3000);
+        }
+
+        window.onload = function() {
+            resetToHome();
+        };
+    </script>
+</body>
+</html>
